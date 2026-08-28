@@ -1,0 +1,51 @@
+name: CPU kernel contract
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cpu-kernel-contract-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: verify canonical kernel
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920
+        with:
+          egress-policy: audit
+
+      - name: Check out exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Set up exact Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12.13'
+          check-latest: false
+
+      - name: Verify restored Hub kernel and falsifiability suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          kernel='build/torch-universal/szl_invariants/__init__.py'
+          test "$(wc -c < "$kernel")" -eq 32918
+          grep -Fq 'def verify_ed25519(' "$kernel"
+          grep -Fq 'def run_invariants(' "$kernel"
+          grep -Fq 'def selfcheck(' "$kernel"
+          grep -Fq 'def _build_demo_chain(' "$kernel"
+          test ! -e model.joblib
+          python -I -m py_compile "$kernel" tests/test_invariants.py
+          python -I tests/test_invariants.py
+          git diff --check
