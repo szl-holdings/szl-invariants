@@ -1,0 +1,21 @@
+{
+  "name": "szl_invariants",
+  "version": "0.1.0",
+  "universal": true,
+  "backends": [
+    "cpu"
+  ],
+  "torch_required": false,
+  "stdlib_only": true,
+  "author": "SZL Holdings",
+  "license": "Apache-2.0",
+  "artifact_kind": "kernel-code-and-configuration",
+  "trained_weights_present": false,
+  "tests": "14/14 passed (MEASURED local python3 run, stdlib-only)",
+  "lambda_status": "Conjecture 1 (open) — untouched by these invariants; advisory only",
+  "mirrors": "a11oy backbone /api/invariants (artifacts/api-server/src/routes/invariants.ts)",
+  "provenance": {
+    "lean_repo": "szl-holdings/lutar-lean",
+    "doi_lutar_lean": "10.5281/zenodo.20434308"
+  }
+}
