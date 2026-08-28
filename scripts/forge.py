@@ -17,7 +17,6 @@ import numpy as np
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, recall_score
-import joblib
 
 SEED = 20260721
 random.seed(SEED); np.random.seed(SEED)
@@ -167,8 +166,9 @@ mask = np.isin(yte, non_crypto)
 acc_structural = accuracy_score(yte[mask], pred[mask])
 
 out = os.path.dirname(os.path.abspath(__file__))
-joblib.dump(clf, f"{out}/model.joblib")
-model_sha = hashlib.sha256(open(f"{out}/model.joblib","rb").read()).hexdigest()
+# P0: do not emit pickle/joblib. The kernel source is the approved path.
+if os.path.exists(f"{out}/model.joblib") or os.path.exists(f"{os.path.dirname(out)}/model.joblib"):
+    raise SystemExit("REFUSE: model.joblib is present. Delete it; pickle is not an approved load path.")
 receipt = {
   "artifact": "SZLHOLDINGS/szl-invariants surrogate v1",
   "role": "structural triage surrogate — kernel remains ground truth",
@@ -179,7 +179,8 @@ receipt = {
             "split": "80/20 stratified", "features": FEATURE_NAMES,
             "feature_policy": "cheap structural observables only; ed25519 verification EXCLUDED by design (measured blind spot)"},
   "model": {"type": "sklearn.HistGradientBoostingClassifier", "params": {"max_iter": 300, "early_stopping": True, "random_state": SEED},
-             "file": "model.joblib", "sha256": model_sha},
+             "file": None, "serialization": "QUARANTINED", "sha256": None,
+             "statement": "joblib/pickle is not an approved load path. Use torch-ext/szl_invariants kernel source."},
   "metrics_MEASURED": {"test_accuracy_all_classes": round(float(acc), 4),
                         "test_accuracy_structural_only": round(float(acc_structural), 4),
                         "per_class_recall": {k: round(v, 4) for k, v in per_class_recall.items()},
@@ -190,6 +191,14 @@ receipt = {
   "honesty": "Every number above is MEASURED by this run. The surrogate never replaces kernel replay; Λ untouched = Conjecture 1.",
   "trained_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
 }
+quarantine = {
+  "status": "QUARANTINED",
+  "artifact": "model.joblib",
+  "reason": "sklearn/joblib pickle is executable serialization, not an approved load path",
+  "approved_load": "torch-ext/szl_invariants and build/torch-universal/szl_invariants",
+  "hub": "SZLHOLDINGS/szl-invariants model.joblib remains Hub residue until a Hub PR with exact parent_commit deletes it",
+}
+with open(f"{out}/SURROGATE_QUARANTINE.json", "w") as f: json.dump(quarantine, f, indent=2)
 with open(f"{out}/TRAINING_RECEIPT.json", "w") as f: json.dump(receipt, f, indent=2)
 print(json.dumps(receipt["metrics_MEASURED"], indent=2))
 print(f"rows={len(y)} kernel_audited_chains={kernel_checked} wall={receipt['environment']['wall_seconds']}s")

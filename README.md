@@ -9,6 +9,7 @@ Python lives under `torch-ext/szl_invariants/` (`__init__.py` is the package). H
 - Not trained weights, not a LoRA
 - No MEASURED CUDA benches in this repo
 - Passing `selfcheck` (if present) is not an eval leaderboard
+- Hub `model.joblib` is **QUARANTINED** executable serialization. Do not `joblib.load` it. GitHub source is the approved path.
 
 ## Load
 
