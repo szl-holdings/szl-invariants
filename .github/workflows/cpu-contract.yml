@@ -46,6 +46,12 @@ jobs:
           grep -Fq 'def selfcheck(' "$kernel"
           grep -Fq 'def _build_demo_chain(' "$kernel"
           test ! -e model.joblib
-          python -I -m py_compile "$kernel" tests/test_invariants.py
+          if grep -R -n -E "joblib\.(load|dump)[[:space:]]*\(|pickle\.loads?[[:space:]]*\(|dill\.load[[:space:]]*\(" scripts tests torch-ext build; then
+            echo "unsafe serialization API still in approved path" >&2
+            exit 1
+          fi
+          python -I -m py_compile "$kernel" tests/test_invariants.py tests/test_no_unsafe_serialization.py
           python -I tests/test_invariants.py
+          python -I tests/test_no_unsafe_serialization.py
+          python -I scripts/eval.py
           git diff --check
