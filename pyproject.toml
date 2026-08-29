@@ -1,0 +1,10 @@
+[project]
+name = "szl-invariants"
+version = "0.1.0"
+description = "Eight falsifiable receipt/ledger invariants. Software kernel, not a trained model."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.9"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
