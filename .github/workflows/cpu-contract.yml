@@ -40,7 +40,10 @@ jobs:
         run: |
           set -euo pipefail
           kernel='build/torch-universal/szl_invariants/__init__.py'
-          test "$(wc -c < "$kernel")" -eq 32918
+          mirror='torch-ext/szl_invariants/__init__.py'
+          cmp "$kernel" "$mirror"
+          cmp build/torch-universal/szl_invariants/metadata.json \
+            torch-ext/szl_invariants/metadata.json
           grep -Fq 'def verify_ed25519(' "$kernel"
           grep -Fq 'def run_invariants(' "$kernel"
           grep -Fq 'def selfcheck(' "$kernel"
@@ -50,7 +53,8 @@ jobs:
             echo "unsafe serialization API still in approved path" >&2
             exit 1
           fi
-          python -I -m py_compile "$kernel" tests/test_invariants.py tests/test_no_unsafe_serialization.py
+          python -I -m py_compile "$kernel" tests/test_invariants.py \
+            tests/test_model_kernel_parity.py tests/test_no_unsafe_serialization.py
           python -I tests/test_invariants.py
           python -I tests/test_no_unsafe_serialization.py
           python -I scripts/eval.py
