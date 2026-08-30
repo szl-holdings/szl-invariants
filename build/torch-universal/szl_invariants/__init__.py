@@ -3,11 +3,11 @@
 """szl_invariants — falsifiable runtime self-consistency invariants, offline.
 
 ============================ HONEST SCOPE BOX ============================
-The governance kernel below is NOT a trained model. Since surrogate v1 this
-repo ALSO ships a REAL trained companion model (model.joblib, sklearn) with
-MEASURED fidelity — see TRAINING_RECEIPT.json. The kernel remains the sole
-ground truth; the surrogate is fast triage and NEVER replaces replay.
-The kernel itself is a pure-Python, stdlib-only governance kernel: it *replays* the same eight
+The governance kernel below is NOT a trained model. This repository ships no
+trained weights. Historical model.joblib/sklearn surrogate artifacts are
+QUARANTINED because pickle is not an approved load path; see SECURITY.md.
+The kernel source is the only approved load surface and remains the sole
+ground truth. It is a pure-Python, stdlib-only governance kernel that replays the same eight
 FALSIFIABLE runtime invariants the a11oy backbone recomputes live (see
 /api/invariants) over a receipts/ledger JSONL export you hold — fully offline,
 no network, no torch. `get_kernel`-discoverable purely so the family loads the
@@ -102,8 +102,8 @@ PROVENANCE = {
     "lean_repo": "szl-holdings/lutar-lean",
     "doi_lutar_lean": "10.5281/zenodo.20434308",
     "lambda_status": "Conjecture 1 (open) — uniqueness unproven; advisory only",
-    "trained_weights_present": True,
-    "trained_weights_role": "surrogate v1 (model.joblib) — structural triage; kernel stays ground truth; fidelity MEASURED in TRAINING_RECEIPT.json",
+    "trained_weights_present": False,
+    "trained_weights_role": "QUARANTINED — model.joblib/pickle is not an approved load path; kernel source remains authoritative",
 }
 
 DOCTRINE_FOOTER = (
