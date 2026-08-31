@@ -1,0 +1,54 @@
+{
+  "schema": "szl.invariants-source-binding/v1",
+  "repo_id": "SZLHOLDINGS/szl-invariants",
+  "source_repository": "szl-holdings/szl-invariants",
+  "artifact_files": [
+    "build/torch-universal/szl_invariants/__init__.py",
+    "build/torch-universal/szl_invariants/metadata.json",
+    "torch-ext/szl_invariants/__init__.py",
+    "torch-ext/szl_invariants/metadata.json"
+  ],
+  "expected_artifact_sha256": {
+    "build/torch-universal/szl_invariants/__init__.py": "865b34d7196a657f2b9f7cdb3aca615332592d01ebcf0cd9ffd68ad9a4c5abbf",
+    "build/torch-universal/szl_invariants/metadata.json": "4689bab3b861bafc7911b9e70e79e3f1685473c94fff3549116d6793f6f2f4c9",
+    "torch-ext/szl_invariants/__init__.py": "865b34d7196a657f2b9f7cdb3aca615332592d01ebcf0cd9ffd68ad9a4c5abbf",
+    "torch-ext/szl_invariants/metadata.json": "4689bab3b861bafc7911b9e70e79e3f1685473c94fff3549116d6793f6f2f4c9"
+  },
+  "publication_targets": [
+    {
+      "repo_type": "model",
+      "source_path": "build/torch-universal/szl_invariants/__init__.py",
+      "path_in_repo": "build/torch-universal/szl_invariants/__init__.py"
+    },
+    {
+      "repo_type": "model",
+      "source_path": "build/torch-universal/szl_invariants/metadata.json",
+      "path_in_repo": "build/torch-universal/szl_invariants/metadata.json"
+    },
+    {
+      "repo_type": "kernel",
+      "source_path": "build/torch-universal/szl_invariants/__init__.py",
+      "path_in_repo": "build/torch-universal/szl_invariants/__init__.py"
+    },
+    {
+      "repo_type": "kernel",
+      "source_path": "build/torch-universal/szl_invariants/metadata.json",
+      "path_in_repo": "build/torch-universal/szl_invariants/metadata.json"
+    },
+    {
+      "repo_type": "kernel",
+      "source_path": "torch-ext/szl_invariants/__init__.py",
+      "path_in_repo": "build/torch-cpu/szl_invariants/__init__.py"
+    }
+  ],
+  "claims": {
+    "artifact_equivalence": "EXACT_DECLARED_BYTES_AFTER_IMMUTABLE_READBACK",
+    "trained_weights_present": false,
+    "unsafe_serialization": "QUARANTINED_NOT_PUBLISHED"
+  },
+  "limitations": [
+    "This publication repairs declared Python and package metadata only; it does not add a trained model or weights.",
+    "References to model.joblib and pickle are quarantine documentation, not an approved load path or shipped artifact.",
+    "Kernel execution remains advisory and Lambda remains Conjecture 1 (open)."
+  ]
+}
