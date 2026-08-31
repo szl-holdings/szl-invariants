@@ -6,7 +6,7 @@ flag. The ed25519-tamper class is deliberately included to MEASURE the
 surrogate's crypto blind spot (structural features cannot see signature
 tampering) — that is the honest reason the kernel stays authoritative.
 Seeded, receipted, reproducible."""
-import json, os, random, sys, time, hashlib, platform
+import json, os, random, sys, time, platform
 _here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if os.path.isdir(os.path.join(_here, "build", "torch-universal")):
     sys.path.insert(0, os.path.join(_here, "build", "torch-universal"))  # in-repo run
