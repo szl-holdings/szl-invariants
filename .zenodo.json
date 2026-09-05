@@ -1,0 +1,13 @@
+{
+  "title": "szl-invariants — 8 falsifiable receipt invariants (Kernel Hub package)",
+  "upload_type": "software",
+  "description": "Canonical GitHub source for the szl-invariants Kernel Hub package: eight falsifiable invariants over receipt chains, ed25519. Hub is the publish mirror. Doctrine v11.",
+  "creators": [{"name": "Lutar, Stephen P., Jr."}],
+  "license": {"id": "Apache-2.0"},
+  "keywords": ["governed-ai", "invariants", "receipts", "ed25519", "szl-holdings"],
+  "related_identifiers": [
+    {"identifier": "10.5281/zenodo.19944926", "relation": "isSupplementTo", "scheme": "doi"},
+    {"identifier": "https://huggingface.co/SZLHOLDINGS/szl-invariants", "relation": "isDocumentedBy", "scheme": "url"}
+  ],
+  "notes": "NEW work per the szl-papers deposit policy. Mint via GitHub release after enabling this repo in the owner's Zenodo account."
+}
