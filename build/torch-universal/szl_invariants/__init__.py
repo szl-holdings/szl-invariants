@@ -566,6 +566,8 @@ def _receipt_columns_consistent(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
     for r in with_receipt:
         try:
             p = json.loads(r["receiptJson"])
+            if not isinstance(p, dict):
+                raise ValueError("receipt payload must be a JSON object")
         except Exception:
             bad += 1
             worst = worst if worst is not None else r.get("id")
