@@ -66,5 +66,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m pip install --disable-pip-version-check pytest
+          python -m pip install --disable-pip-version-check pytest "cryptography==49.0.0"
           python -m pytest tests -q --tb=short
+
+      - name: Verify clean wheel and editable imports outside source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip wheel --no-deps . --wheel-dir "$RUNNER_TEMP/invariants-wheels"
+          python -m venv "$RUNNER_TEMP/invariants-installed"
+          installed_python="$RUNNER_TEMP/invariants-installed/bin/python"
+          "$installed_python" -m pip install --no-deps "$RUNNER_TEMP"/invariants-wheels/*.whl
+          cd "$RUNNER_TEMP"
+          "$installed_python" -I -B "$GITHUB_WORKSPACE/scripts/verify_installed.py" --mode wheel --source-root "$GITHUB_WORKSPACE"
+          "$installed_python" -m pip install --no-deps -e "$GITHUB_WORKSPACE"
+          "$installed_python" -I -B "$GITHUB_WORKSPACE/scripts/verify_installed.py" --mode editable --source-root "$GITHUB_WORKSPACE"

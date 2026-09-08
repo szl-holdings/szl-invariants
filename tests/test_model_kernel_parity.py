@@ -53,3 +53,6 @@ def test_metadata_rejects_trained_weight_presence_on_both_surfaces() -> None:
 
         assert metadata["artifact_kind"] == "kernel-code-and-configuration"
         assert metadata["trained_weights_present"] is False
+        assert metadata["stdlib_without_signature_verification"] is True
+        assert metadata["stdlib_only"] is False
+        assert metadata["optional_dependencies"]["signature_verification"] == "cryptography>=46,<50"
