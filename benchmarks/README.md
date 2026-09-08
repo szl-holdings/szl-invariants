@@ -31,11 +31,13 @@ recorded by the script.
 Inputs are generated independently with sorted stdlib JSON and SHA-256,
 including Unicode strings and integer facts. All generated row hashes must
 match the kernel and a changed last-row fact must report `VIOLATED`.
-Each measured candidate report must exactly equal the pre-change report;
-the fixture must remain unchanged. Cryptographic verification remains
+All measured candidate report data must equal the pre-change report except
+the now-explicit finite-number loop predicate text; each timed report must
+exactly equal its own implementation's precomputed report. The fixture must
+remain unchanged. Cryptographic verification remains
 `UNAVAILABLE` because no signing key or signatures are supplied.
 
-## Observed run on 2026-09-07
+## Initial object-guard run on 2026-09-07
 
 Hardware: Intel Core Ultra 9 285H, 16 logical CPUs, Windows 11 build 26200.
 Runtime: CPython 3.12.10 AMD64; QueryPerformanceCounter, reported resolution
@@ -69,10 +71,42 @@ The candidate source canonical LF hash is
 `d90e40e5bda398769e3a13a71e752526410de40e675c0c21c5b624547aedbdad`;
 the receipt also records the actual Windows working-copy byte hash.
 
+## Hardened candidate run on 2026-09-07 local time
+
+The second candidate additionally removes the custom cryptographic fallback,
+requires the optional audited backend for signature verification, and rejects
+nonfinite or wrong-type loop-step values. The corresponding regression suite
+first reproduced seven failures. The final suite passed 55 tests locally with
+cryptography 49.0.0, including the public RFC 8032 vector and the deliberately
+unavailable-backend case. Hosted checks and Hub publication are separate.
+
+`results/cpu-20260907-hardened.json` is a distinct immutable local run, retaining
+all 496 raw samples with the same warmup/sample protocol and hardware. Its
+timestamp is 2026-09-08 02:26 UTC, still September 7 in America/New_York.
+
+| Rows | Fixture | Baseline median ms | Hardened median ms | Hardened p95 ms |
+|---:|---|---:|---:|---:|
+| 1 | clean | 0.0285 | 0.0287 | 0.0314 |
+| 1 | tampered | 0.0229 | 0.0231 | 0.0255 |
+| 32 | clean | 0.5647 | 0.5521 | 0.7016 |
+| 32 | tampered | 0.7747 | 0.7422 | 1.4002 |
+| 256 | clean | 4.9061 | 4.9029 | 7.9499 |
+| 256 | tampered | 4.8344 | 4.6182 | 5.7054 |
+| 1024 | clean | 49.3969 | 50.3516 | 188.7353 |
+| 1024 | tampered | 59.7669 | 49.2220 | 219.0229 |
+
+The 1024-row tail latency was very noisy on this shared machine; no speedup
+claim follows. Receipt SHA-256:
+`f5c8a03542e512b9e9706aa0e09b50cbc33e136947c357206646e66b9f6be145`.
+Hardened source canonical LF SHA-256:
+`3f7c7afb5143c08cde920493ad1e61613ac990cea334b0159c933d4fb2a7ee90`.
+Both publication source variants bind those same canonical bytes.
+
 ## Scope limits
 
-Passing this benchmark does not qualify the pure-Python signature fallback,
-nonfinite numeric inputs, every malformed ledger type, JavaScript/Python
-number serialization equivalence, or published Hub artifacts. Those paths
-require separate conformance checks. This deterministic software kernel has
+Passing this unsigned benchmark does not qualify signature implementations,
+every malformed ledger type, JavaScript/Python number serialization
+equivalence, or published Hub artifacts. The removed fallback is not an
+available verification backend. Signature and nonfinite regressions are
+covered by separate tests, not by the timing claims. This deterministic software kernel has
 no trainable weights; training a surrogate would not verify its invariants.

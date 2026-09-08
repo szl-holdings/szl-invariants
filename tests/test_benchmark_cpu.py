@@ -28,3 +28,12 @@ def test_timing_summary_retains_all_raw_samples() -> None:
         "samples_ns": [10, 50, 20, 40, 30], "min_ns": 10, "median_ns": 30,
         "p95_ns": 50, "max_ns": 50, "median_ns_per_row": 15,
     }
+
+
+def test_comparison_ignores_only_documented_loop_predicate_not_status() -> None:
+    before = {"invariants": [{"id": "loop-steps-positive", "predicate": "old", "status": "HOLDS"}]}
+    after = {"invariants": [{"id": "loop-steps-positive", "predicate": "new", "status": "HOLDS"}]}
+    assert bench.comparable_report(before) == bench.comparable_report(after)
+    assert before["invariants"][0]["predicate"] == "old"
+    after["invariants"][0]["status"] = "VIOLATED"
+    assert bench.comparable_report(before) != bench.comparable_report(after)

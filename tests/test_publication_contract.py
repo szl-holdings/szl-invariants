@@ -13,16 +13,16 @@ CONTRACT = ROOT / "publishing" / "invariants-source-binding.json"
 
 EXPECTED_ARTIFACTS = {
     "build/torch-universal/szl_invariants/__init__.py": (
-        "d90e40e5bda398769e3a13a71e752526410de40e675c0c21c5b624547aedbdad"
+        "3f7c7afb5143c08cde920493ad1e61613ac990cea334b0159c933d4fb2a7ee90"
     ),
     "build/torch-universal/szl_invariants/metadata.json": (
-        "4689bab3b861bafc7911b9e70e79e3f1685473c94fff3549116d6793f6f2f4c9"
+        "4e645a7b019a3893a2cb64be6471f19f3c7572e1f1b29e799035f1d298a55039"
     ),
     "torch-ext/szl_invariants/__init__.py": (
-        "d90e40e5bda398769e3a13a71e752526410de40e675c0c21c5b624547aedbdad"
+        "3f7c7afb5143c08cde920493ad1e61613ac990cea334b0159c933d4fb2a7ee90"
     ),
     "torch-ext/szl_invariants/metadata.json": (
-        "4689bab3b861bafc7911b9e70e79e3f1685473c94fff3549116d6793f6f2f4c9"
+        "4e645a7b019a3893a2cb64be6471f19f3c7572e1f1b29e799035f1d298a55039"
     ),
 }
 

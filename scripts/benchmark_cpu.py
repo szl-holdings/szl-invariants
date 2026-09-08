@@ -76,6 +76,16 @@ def chain_status(report: dict) -> str:
     return next(item["status"] for item in report["invariants"] if item["id"] == "receipt-chain-continuity")
 
 
+def comparable_report(report: dict) -> dict:
+    comparison = json.loads(encode(report))
+    # Only this explanatory predicate changed when finite numeric input was
+    # made explicit. All statuses, counts, reasons and other fields must match.
+    for item in comparison["invariants"]:
+        if item["id"] == "loop-steps-positive":
+            item.pop("predicate")
+    return comparison
+
+
 def quantiles(samples: list[int], rows: int) -> dict:
     ordered = sorted(samples)
     return {"samples_ns": samples, "min_ns": min(samples),
@@ -103,7 +113,7 @@ def run(*, repeats: int, warmup: int, cpu_name: str) -> dict:
             before = encode(fixture)
             base_report = evaluate(baseline, fixture)
             candidate_report = evaluate(candidate, fixture)
-            if candidate_report != base_report or chain_status(candidate_report) != expected:
+            if comparable_report(candidate_report) != comparable_report(base_report) or chain_status(candidate_report) != expected:
                 raise AssertionError("candidate/reference fixture correctness failed")
             if candidate_report["latentVerification"]["status"] != "UNAVAILABLE":
                 raise AssertionError("missing signature authority must remain unavailable")
@@ -112,19 +122,21 @@ def run(*, repeats: int, warmup: int, cpu_name: str) -> dict:
                 evaluate(candidate, fixture)
             samples = {"baseline": [], "candidate": []}
             modules = {"baseline": baseline, "candidate": candidate}
+            expected_reports = {"baseline": base_report, "candidate": candidate_report}
             for trial in range(repeats):
                 order = ("baseline", "candidate") if trial % 2 == 0 else ("candidate", "baseline")
                 for name in order:
                     started = time.perf_counter_ns()
                     observed = evaluate(modules[name], fixture)
                     elapsed = time.perf_counter_ns() - started
-                    if observed != candidate_report:
+                    if observed != expected_reports[name]:
                         raise AssertionError("non-deterministic result during measured run")
                     samples[name].append(elapsed)
             if encode(fixture) != before:
                 raise AssertionError("kernel mutated benchmark input")
             records.append({"rows": size, "case": case, "chain_status": expected,
                             "fixture_sha256": digest(before), "output_sha256": digest(encode(candidate_report)),
+                            "baseline_output_sha256": digest(encode(base_report)),
                             "output_summary": candidate_report["summary"],
                             "timings": {name: quantiles(values, size) for name, values in samples.items()}})
     return {
@@ -145,7 +157,8 @@ def run(*, repeats: int, warmup: int, cpu_name: str) -> dict:
                    "ordering": "alternating baseline/candidate", "gc": "default enabled",
                    "threads": "one Python call stream; process affinity and host load uncontrolled",
                    "input_scope": "unsigned synthetic integer facts; eight invariants replayed; crypto unavailable",
-                   "baseline_scope": "same reviewed kernel before receipt-object type guard; not a competing library"},
+                   "baseline_scope": "same reviewed kernel before input guards and removal of custom signature fallback; not a competing library",
+                   "comparison_scope": "all report fields except loop-steps-positive explanatory predicate; every timed report must exactly match its own implementation's precomputed report"},
         "cases": records,
         "limitations": ["Microbenchmark only: no general speedup, production throughput or energy claim.",
                         "No GPU/CUDA execution or evaluation of published Hub bytes.",

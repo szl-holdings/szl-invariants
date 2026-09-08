@@ -9,6 +9,7 @@ UNAVAILABLE / NO_DATA — never coerced to a pass.
 import base64
 import os
 import sys
+import unittest
 
 sys.path.insert(
     0,
@@ -128,8 +129,8 @@ def test_ed25519_real_signature_holds_and_tamper_fails():
             Ed25519PrivateKey,
         )
         from cryptography.hazmat.primitives import serialization
-    except Exception:
-        return  # honest skip when cryptography is absent (fallback path unexercised here)
+    except ImportError:
+        raise unittest.SkipTest("cryptography unavailable; positive signature test not run")
     priv = Ed25519PrivateKey.generate()
     pub = priv.public_key()
     spki = pub.public_bytes(
@@ -175,8 +176,14 @@ def test_selfcheck_demonstrates_falsifiability():
 if __name__ == "__main__":
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     passed = 0
+    skipped = 0
     for fn in fns:
-        fn()
+        try:
+            fn()
+        except unittest.SkipTest as exc:
+            skipped += 1
+            print(f"  skipped {fn.__name__}: {exc}")
+            continue
         passed += 1
         print(f"  ok {fn.__name__}")
-    print(f"OK — {passed}/{len(fns)} szl_invariants tests passed.")
+    print(f"OK — {passed}/{len(fns)} szl_invariants tests passed; {skipped} skipped.")

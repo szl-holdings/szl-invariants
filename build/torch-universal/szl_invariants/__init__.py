@@ -7,7 +7,8 @@ The governance kernel below is NOT a trained model. This repository ships no
 trained weights. Historical model.joblib/sklearn surrogate artifacts are
 QUARANTINED because pickle is not an approved load path; see SECURITY.md.
 The kernel source is the only approved load surface and remains the sole
-ground truth. It is a pure-Python, stdlib-only governance kernel that replays the same eight
+ground truth. Its unsigned checks are pure Python and stdlib-only; Ed25519
+verification requires optional cryptography, otherwise UNAVAILABLE. It replays eight
 FALSIFIABLE runtime invariants the a11oy backbone recomputes live (see
 /api/invariants) over a receipts/ledger JSONL export you hold — fully offline,
 no network, no torch. `get_kernel`-discoverable purely so the family loads the
@@ -44,6 +45,7 @@ Quickstart (offline):
 from __future__ import annotations
 
 import json
+import math
 from hashlib import sha256
 from typing import Any, Dict, List, Optional, Sequence
 
@@ -193,131 +195,45 @@ def keyid_from_spki(spki_base64: str) -> str:
     return sha256(der).hexdigest()[:16]
 
 
+def _ed25519_backend():
+    """Load the optional audited capability; absence is never a pass."""
+    try:
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+        from cryptography.hazmat.primitives.serialization import load_der_public_key
+    except Exception:
+        return None
+    return Ed25519PublicKey, load_der_public_key
+
+
 def verify_ed25519(
     canonical: str,
     signature_base64: str,
     spki_base64: str,
 ) -> bool:
-    """ed25519 verify over the EXACT canonical bytes. Prefers the audited
-    `cryptography` backend; falls back to a stdlib-only pure-Python RFC 8032
-    verifier when `cryptography` is not installed (so verification is genuinely
-    offline-capable). Returns False on any failure — never coerced True."""
+    """Verify exact bytes using cryptography, or fail closed.
+
+    This boolean helper returns False when the optional backend is unavailable.
+    run_invariants reports that missing capability explicitly as UNAVAILABLE;
+    it never delegates verification to a custom cryptographic fallback.
+    """
     import base64
 
-    try:
-        sig = base64.b64decode(signature_base64)
-        der = base64.b64decode(spki_base64)
-    except Exception:
+    backend = _ed25519_backend()
+    if backend is None:
         return False
-    msg = canonical.encode("utf-8")
-    try:  # audited backend first
-        from cryptography.hazmat.primitives.serialization import (
-            load_der_public_key,
-        )
-        from cryptography.exceptions import InvalidSignature
-
+    public_key_type, load_der_public_key = backend
+    try:
+        sig = base64.b64decode(signature_base64, validate=True)
+        der = base64.b64decode(spki_base64, validate=True)
+        if len(sig) != 64:
+            return False
         pub = load_der_public_key(der)
-        try:
-            pub.verify(sig, msg)  # type: ignore[call-arg]
-            return True
-        except InvalidSignature:
+        if not isinstance(pub, public_key_type):
             return False
-        except Exception:
-            return False
-    except Exception:
-        pass
-    # stdlib-only fallback: raw key is the trailing 32 bytes of the SPKI DER.
-    if len(der) < 32 or len(sig) != 64:
-        return False
-    raw = der[-32:]
-    try:
-        return _ed25519_verify_pure(raw, msg, sig)
+        pub.verify(sig, canonical.encode("utf-8"))
+        return True
     except Exception:
         return False
-
-
-# --------------------------------------------------------------------------- #
-# Pure-Python ed25519 verify (RFC 8032 reference form; stdlib hashlib only).   #
-# Used ONLY when `cryptography` is unavailable — keeps the kernel stdlib-only.  #
-# --------------------------------------------------------------------------- #
-_p = 2 ** 255 - 19
-_d = (-121665 * pow(121666, _p - 2, _p)) % _p
-_I = pow(2, (_p - 1) // 4, _p)
-_L = 2 ** 252 + 27742317777372353535851937790883648493
-
-
-def _xrecover(y: int) -> int:
-    xx = (y * y - 1) * pow(_d * y * y + 1, _p - 2, _p)
-    x = pow(xx, (_p + 3) // 8, _p)
-    if (x * x - xx) % _p != 0:
-        x = (x * _I) % _p
-    if x % 2 != 0:
-        x = _p - x
-    return x
-
-
-_By = (4 * pow(5, _p - 2, _p)) % _p
-_Bx = _xrecover(_By)
-_B = (_Bx % _p, _By % _p, 1, (_Bx * _By) % _p)
-
-
-def _edwards_add(P, Q):
-    x1, y1, z1, t1 = P
-    x2, y2, z2, t2 = Q
-    a = ((y1 - x1) * (y2 - x2)) % _p
-    b = ((y1 + x1) * (y2 + x2)) % _p
-    c = (2 * t1 * t2 * _d) % _p
-    dd = (2 * z1 * z2) % _p
-    e = b - a
-    f = dd - c
-    g = dd + c
-    h = b + a
-    return ((e * f) % _p, (g * h) % _p, (f * g) % _p, (e * h) % _p)
-
-
-def _scalarmult(P, e):
-    if e == 0:
-        return (0, 1, 1, 0)
-    Q = _scalarmult(P, e // 2)
-    Q = _edwards_add(Q, Q)
-    if e & 1:
-        Q = _edwards_add(Q, P)
-    return Q
-
-
-def _to_affine(P):
-    x, y, z, _t = P
-    zi = pow(z, _p - 2, _p)
-    return (x * zi) % _p, (y * zi) % _p
-
-
-def _decodeint(s: bytes) -> int:
-    return int.from_bytes(s, "little")
-
-
-def _decodepoint(s: bytes):
-    y = int.from_bytes(s, "little") & ((1 << 255) - 1)
-    x = _xrecover(y)
-    if x & 1 != (s[31] >> 7) & 1:
-        x = _p - x
-    P = (x, y, 1, (x * y) % _p)
-    return P
-
-
-def _ed25519_verify_pure(public: bytes, msg: bytes, sig: bytes) -> bool:
-    A = _decodepoint(public)
-    R = _decodepoint(sig[:32])
-    S = _decodeint(sig[32:])
-    h = _decodeint(sha256_512(sig[:32] + public + msg))
-    left = _to_affine(_scalarmult(_B, S))
-    right = _to_affine(_edwards_add(R, _scalarmult(A, h)))
-    return left == right
-
-
-def sha256_512(b: bytes) -> bytes:
-    from hashlib import sha512
-
-    return sha512(b).digest()
 
 
 # --------------------------------------------------------------------------- #
@@ -493,21 +409,29 @@ def _signed_columns_atomic(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 def _loop_steps_positive(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
     subject = [r for r in rows if r.get("ok") and not r.get("demo")]
+    def valid_steps(value: Any) -> bool:
+        return (
+            isinstance(value, (int, float))
+            and not isinstance(value, bool)
+            and (not isinstance(value, float) or math.isfinite(value))
+            and value >= 1
+        )
+
     bad = [
         r
         for r in subject
-        if r.get("loopSteps") is None or (r.get("loopSteps") or 0) < 1
+        if not valid_steps(r.get("loopSteps"))
     ]
     status = "NO_DATA" if not subject else "VIOLATED" if bad else "HOLDS"
     detail = (
-        f"{len(bad)} served row(s) recorded no loop step"
+        f"{len(bad)} served row(s) recorded an invalid or missing loop step"
         if bad
         else f"{len(subject)} served row(s), each took at least one step"
     )
     return _inv(
         "loop-steps-positive",
         "Every live-served run took at least one loop step",
-        "for every row where ok = true and demo = false: loopSteps >= 1 (lower bound only — the per-run upper bound targets.length is not persisted, so it is not asserted)",
+        "for every row where ok = true and demo = false: loopSteps is a finite number (not boolean) >= 1 (lower bound only — the per-run upper bound targets.length is not persisted, so it is not asserted)",
         "LOOP_DOCTRINE — bounded, terminating, receipt-closed",
         status,
         len(subject),
@@ -532,7 +456,7 @@ def _receipt_ed25519_verify(
             0,
             0,
             None,
-            "no public key supplied — signatures cannot be verified offline (honest UNAVAILABLE, not a judgment on the receipts)",
+            tally.get("unavailableReason", "no public key supplied — signatures cannot be verified offline (honest UNAVAILABLE, not a judgment on the receipts)"),
         )
     if not signed_rows:
         status = "NO_DATA"
@@ -678,6 +602,9 @@ def _ed25519_tally(
     coverage metric (no second verification pass — mirrors the app)."""
     if pubkey is None:
         return {"keyId": None, "verified": 0, "hardFail": 0, "rotated": 0, "worst": None}
+    if _ed25519_backend() is None:
+        return {"keyId": None, "verified": 0, "hardFail": 0, "rotated": 0, "worst": None,
+                "unavailableReason": "optional cryptography backend unavailable — signatures were not verified"}
     cur_key = keyid_from_spki(pubkey)
     verified = hard_fail = rotated = 0
     worst = None
@@ -712,6 +639,7 @@ def run_invariants(
       unreachable"): nothing is fabricated.
     - `samples=None` → the flywheel-lineage invariant is UNAVAILABLE.
     - `pubkey=None` → the ed25519 invariant + latent coverage are UNAVAILABLE.
+    - missing optional cryptography → signature checks and coverage UNAVAILABLE.
 
     Returns a dict with `label`, `status`, `summary`, `latentVerification`,
     `invariants`, `doctrine`, `note`.
@@ -762,10 +690,10 @@ def run_invariants(
     violated = sum(1 for i in invariants if i["status"] == "VIOLATED")
     indeterminate = len(invariants) - holds - violated
 
-    if pubkey is None:
+    if tally["keyId"] is None:
         latent = {
             "status": "UNAVAILABLE",
-            "reason": "no public key supplied — hash/signature-space verification cannot run",
+            "reason": tally.get("unavailableReason", "no public key supplied — hash/signature-space verification cannot run"),
             "enumerated": len(rows),
             "verified": 0,
             "verifiedRatio": None,

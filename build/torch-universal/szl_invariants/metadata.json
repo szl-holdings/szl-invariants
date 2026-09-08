@@ -6,12 +6,14 @@
     "cpu"
   ],
   "torch_required": false,
-  "stdlib_only": true,
+  "stdlib_only": false,
+  "stdlib_without_signature_verification": true,
+  "optional_dependencies": {"signature_verification": "cryptography>=46,<50"},
   "author": "SZL Holdings",
   "license": "Apache-2.0",
   "artifact_kind": "kernel-code-and-configuration",
   "trained_weights_present": false,
-  "tests": "14/14 passed (MEASURED local python3 run, stdlib-only)",
+  "tests": "See exact-revision tests and benchmarks; unsigned stdlib checks do not qualify signatures.",
   "lambda_status": "Conjecture 1 (open) — untouched by these invariants; advisory only",
   "mirrors": "a11oy backbone /api/invariants (artifacts/api-server/src/routes/invariants.ts)",
   "provenance": {
