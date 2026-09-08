@@ -12,7 +12,7 @@ def test_explicit_package_and_metadata_discovery() -> None:
     import tomllib
 
     config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    assert config["build-system"] == {"requires": ["setuptools==80.9.0"], "build-backend": "setuptools.build_meta"}
+    assert config["build-system"] == {"requires": ["setuptools==83.0.0"], "build-backend": "setuptools.build_meta"}
     setuptools = config["tool"]["setuptools"]
     assert setuptools["packages"] == ["szl_invariants"]
     assert setuptools["package-dir"] == {"": "torch-ext"}
