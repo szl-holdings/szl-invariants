@@ -7,6 +7,11 @@ import subprocess
 import unittest
 from pathlib import Path
 
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python 3.9 and 3.10 use the test-only backport.
+    import tomli as tomllib
+
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "publishing" / "invariants-source-binding.json"
@@ -101,8 +106,6 @@ def _validate_contract(payload: dict[str, object]) -> None:
 
 def _validate_package_publication(payload: dict[str, object]) -> None:
     """Derive completeness from installed package members, not EXPECTED_TARGETS."""
-    import tomllib
-
     config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     setuptools = config["tool"]["setuptools"]
     expected = set()

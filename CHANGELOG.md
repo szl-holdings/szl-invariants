@@ -7,6 +7,8 @@
   no kernel bytes, artifact hashes, trained-weight claims or publisher gates change.
 - Test publication completeness against the installable package's Python files
   and declared package data, including missing, duplicated and misrouted targets.
+- Preserve Python 3.9 support with a conditional development-only TOML backport,
+  a Python-compatible build-backend pin, and minimum-version CI coverage.
 
 ## 2026-08-28
 

@@ -1,5 +1,5 @@
-# Standard Python gate for the szl-holdings estate: ruff + pytest on the two
-# supported interpreters. Installed by the szl-alignment engine (only into
+# Standard Python gate for the szl-holdings estate: ruff + pytest, including
+# this package's declared Python 3.9 minimum. Installed by the szl-alignment engine (only into
 # repos where Python is detected); keep in sync with
 # alignment/templates/workflows/base-python-ci.yml.
 name: base-python-ci
@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.9", "3.11", "3.12"]
     steps:
       # Org policy: every action is pinned to a full-length commit SHA.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
