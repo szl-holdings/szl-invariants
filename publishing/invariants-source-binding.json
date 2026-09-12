@@ -39,6 +39,11 @@
       "repo_type": "kernel",
       "source_path": "torch-ext/szl_invariants/__init__.py",
       "path_in_repo": "build/torch-cpu/szl_invariants/__init__.py"
+    },
+    {
+      "repo_type": "kernel",
+      "source_path": "torch-ext/szl_invariants/metadata.json",
+      "path_in_repo": "build/torch-cpu/szl_invariants/metadata.json"
     }
   ],
   "claims": {
