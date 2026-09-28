@@ -1,7 +1,7 @@
 [build-system]
 requires = [
     "setuptools==82.0.1; python_version < '3.10'",
-    "setuptools==83.0.0; python_version >= '3.10'",
+    "setuptools==84.0.0; python_version >= '3.10'",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -14,7 +14,7 @@ license = { text = "Apache-2.0" }
 requires-python = ">=3.9"
 
 [project.optional-dependencies]
-crypto = ["cryptography>=46,<50"]
+crypto = ["cryptography>=46,<51"]
 dev = ["tomli==2.4.1; python_version < '3.11'"]
 
 [tool.setuptools]
