@@ -101,6 +101,71 @@ def test_flywheel_lineage_violation():
     assert inv["status"] == "VIOLATED"
 
 
+def _flywheel(rows, samples):
+    r = si.run_invariants(rows, samples=samples, pubkey=None)
+    return next(i for i in r["invariants"] if i["id"] == "flywheel-lineage")
+
+
+_OWN_METAL_ROW = {
+    "id": 1,
+    "ok": True,
+    "demo": False,
+    "servedNode": "node-a",
+    "receiptId": "r-own",
+}
+
+
+def test_flywheel_prejoined_sample_cannot_self_assert_lineage():
+    forged = {
+        "sampleId": 1,
+        "receiptId": "missing",
+        "runFound": True,
+        "runDemo": False,
+        "runServedNode": "claimed",
+    }
+    assert _flywheel([], [forged])["status"] == "VIOLATED"
+    assert _flywheel([dict(_OWN_METAL_ROW)], [forged])["status"] == "VIOLATED"
+
+
+def test_flywheel_prejoined_claim_contradicting_ledger_is_violation():
+    rows = [
+        {"id": 1, "ok": True, "demo": True, "servedNode": None, "receiptId": "r-demo"}
+    ]
+    claimed = {
+        "sampleId": 1,
+        "receiptId": "r-demo",
+        "runFound": True,
+        "runDemo": False,
+        "runServedNode": "claimed",
+    }
+    assert _flywheel(rows, [claimed])["status"] == "VIOLATED"
+    wrong_node = {
+        "sampleId": 2,
+        "receiptId": "r-own",
+        "runFound": True,
+        "runDemo": False,
+        "runServedNode": "other-node",
+    }
+    assert _flywheel([dict(_OWN_METAL_ROW)], [wrong_node])["status"] == "VIOLATED"
+    untyped = {"sampleId": 3, "receiptId": "r-own", "runFound": 1}
+    assert _flywheel([dict(_OWN_METAL_ROW)], [untyped])["status"] == "VIOLATED"
+
+
+def test_flywheel_consistent_prejoined_and_raw_samples_hold():
+    consistent = {
+        "sampleId": 1,
+        "receiptId": "r-own",
+        "runFound": True,
+        "runDemo": False,
+        "runServedNode": "node-a",
+    }
+    assert _flywheel([dict(_OWN_METAL_ROW)], [consistent])["status"] == "HOLDS"
+    raw = {"sampleId": 2, "receiptId": "r-own"}
+    inv = _flywheel([dict(_OWN_METAL_ROW)], [raw])
+    assert inv["status"] == "HOLDS"
+    assert _flywheel([dict(_OWN_METAL_ROW)], [{"sampleId": 3}])["status"] == "NO_DATA"
+
+
 def test_receipt_columns_consistent_and_mismatch():
     canonical = si.canonical_json(
         {"receiptId": "r1", "goalSha256": "g", "outputSha256": "o", "keyId": "k1"}
