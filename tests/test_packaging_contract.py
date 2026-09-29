@@ -18,7 +18,7 @@ def test_explicit_package_and_metadata_discovery() -> None:
     assert config["build-system"] == {
         "requires": [
             "setuptools==82.0.1; python_version < '3.10'",
-            "setuptools==83.0.0; python_version >= '3.10'",
+            "setuptools==84.0.0; python_version >= '3.10'",
         ],
         "build-backend": "setuptools.build_meta",
     }
