@@ -1,6 +1,7 @@
 # szl-invariants
 <!-- szl:header v1 -->
 <!-- badges: add this repo's CI / release / status badges here -->
+[![PyPI](https://img.shields.io/pypi/v/szl-invariants)](https://pypi.org/project/szl-invariants/)
 [![org: szl-holdings](https://img.shields.io/badge/org-szl--holdings-black)](https://github.com/szl-holdings)
 [![doctrine](https://img.shields.io/badge/doctrine-control%20before%20action%20%C2%B7%20evidence%20after-blue)](https://a-11-oy.com)
 
