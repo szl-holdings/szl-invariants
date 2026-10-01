@@ -17,6 +17,12 @@ requires-python = ">=3.9"
 crypto = ["cryptography>=46,<50"]
 dev = ["tomli==2.4.1; python_version < '3.11'"]
 
+[project.urls]
+Homepage = "https://github.com/szl-holdings/szl-invariants"
+Source = "https://github.com/szl-holdings/szl-invariants"
+Issues = "https://github.com/szl-holdings/szl-invariants/issues"
+Changelog = "https://github.com/szl-holdings/szl-invariants/releases"
+
 [tool.setuptools]
 packages = ["szl_invariants"]
 package-dir = {"" = "torch-ext"}
@@ -27,3 +33,6 @@ szl_invariants = ["metadata.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.szl.release]
+import_names = ["szl_invariants"] # wheel top-level import names; the release gate fails if the built wheel differs
