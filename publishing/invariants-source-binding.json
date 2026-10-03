@@ -9,10 +9,10 @@
     "torch-ext/szl_invariants/metadata.json"
   ],
   "expected_artifact_sha256": {
-    "build/torch-universal/szl_invariants/__init__.py": "1b51b8e7cd88f98661226ea7f46d4fa7b1dae9b3eece85f6643aa486dbd7f635",
-    "build/torch-universal/szl_invariants/metadata.json": "4e645a7b019a3893a2cb64be6471f19f3c7572e1f1b29e799035f1d298a55039",
-    "torch-ext/szl_invariants/__init__.py": "1b51b8e7cd88f98661226ea7f46d4fa7b1dae9b3eece85f6643aa486dbd7f635",
-    "torch-ext/szl_invariants/metadata.json": "4e645a7b019a3893a2cb64be6471f19f3c7572e1f1b29e799035f1d298a55039"
+    "build/torch-universal/szl_invariants/__init__.py": "83469f3521e4553fd20a9012830449f0b88d2b2cbd971f21c85c6491e978f3ee",
+    "build/torch-universal/szl_invariants/metadata.json": "938fbba561047b0728e60603e71f535d6a2eb7adf9bd52b5f2c8af9b4ad97816",
+    "torch-ext/szl_invariants/__init__.py": "83469f3521e4553fd20a9012830449f0b88d2b2cbd971f21c85c6491e978f3ee",
+    "torch-ext/szl_invariants/metadata.json": "938fbba561047b0728e60603e71f535d6a2eb7adf9bd52b5f2c8af9b4ad97816"
   },
   "publication_targets": [
     {

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.1 (release candidate)
+
+- Prepare a maintenance release carrying the canonical GitHub Source, issue,
+  and changelog URLs and supported Python classifiers already on main. The
+  immutable PyPI 0.1.0 distributions do not contain those project URLs.
+- Keep the distribution, Python module, and both package-metadata variants at
+  the same version; refresh their declared publication hashes. Invariant logic,
+  signature requirements, six Hub destinations, and advisory claims are unchanged.
+- Publication remains pending. After protected source admission, reconcile the
+  exact source through Forge's governed model/kernel mirror and publish the
+  tag-bound PyPI release through Trusted Publishing; retain both readbacks.
+
 ## 2026-09-29
 
 - Retire the one-shot Hub joblib quarantine writer (`hub-joblib-quarantine.yml`,
