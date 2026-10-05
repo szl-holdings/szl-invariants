@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-crypto = ["cryptography>=46,<50"]
+crypto = ["cryptography>=46,<51"]
 dev = ["tomli==2.4.1; python_version < '3.11'"]
 
 [project.urls]
