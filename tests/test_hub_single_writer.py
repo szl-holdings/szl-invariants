@@ -19,12 +19,18 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# No committed writer lives here yet. SZLHOLDINGS/szl-invariants (model and kernel) gets
-# one through the shared szl-holdings/.github reusable-hf-mirror.yml caller
-# (HF upgrade plan P7/D9); add exactly that caller here when it lands. The
-# one-shot joblib quarantine writer was removed once the Hub held no
-# model.joblib; tests/test_no_unsafe_serialization.py still refuses it at source.
-WRITERS: frozenset[str] = frozenset()
+# The one committed writer: hf-kernel-publish.yml publishes the kernel repo
+# kernels/SZLHOLDINGS/szl-invariants (main + v<major>) and then points the model twin
+# SZLHOLDINGS/szl-invariants at it, through its git transport in
+# scripts/szl_kernel_publish.py. The workflow is the only file that binds the Hub
+# secret; the script holds no credential of its own (it reads HF_TOKEN from the two
+# writing steps' environment). The one-shot joblib quarantine writer was removed once
+# the Hub held no model.joblib; tests/test_no_unsafe_serialization.py still refuses it
+# at source.
+WRITERS: frozenset[str] = frozenset({
+    ".github/workflows/hf-kernel-publish.yml",
+    "scripts/szl_kernel_publish.py",
+})
 
 # Executable sources only. Tests, docs and data corpora are not writers.
 EXECUTABLE_SUFFIXES = {".py", ".sh", ".bash", ".ps1", ".js", ".mjs", ".cjs", ".ts", ".yml", ".yaml"}

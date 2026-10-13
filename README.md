@@ -16,7 +16,7 @@
 
 Software kernel for SZL runtime invariants. **Not a model. No weights.**
 
-Python lives under `torch-ext/szl_invariants/` (`__init__.py` is the package). Hub mirror: [`kernels/SZLHOLDINGS/szl-invariants`](https://huggingface.co/kernels/SZLHOLDINGS/szl-invariants). Card: [`SZLHOLDINGS/szl-invariants`](https://huggingface.co/SZLHOLDINGS/szl-invariants).
+Python lives under `torch-ext/szl_invariants/` (`__init__.py` is the package). Hub kernel: [`kernels/SZLHOLDINGS/szl-invariants`](https://huggingface.co/kernels/SZLHOLDINGS/szl-invariants), published from this repository by [`hf-kernel-publish`](.github/workflows/hf-kernel-publish.yml) (card source: [`hf/kernel-card.md`](hf/kernel-card.md)). The model repo [`SZLHOLDINGS/szl-invariants`](https://huggingface.co/SZLHOLDINGS/szl-invariants) only points to the kernel repo; it holds no loadable build.
 
 ## What this is NOT
 
@@ -27,16 +27,19 @@ Python lives under `torch-ext/szl_invariants/` (`__init__.py` is the package). H
 
 ## Load only a verified publication
 
-A merged GitHub fix is not proof of a Hugging Face release. The canonical
-[Forge publication workflow](https://github.com/szl-holdings/szl-forge/blob/main/.github/workflows/publish-szl-invariants.yml)
-must authorize the exact protected source and publisher revisions, serialize
-publication, and verify the immutable provider bytes. Retain its authorization
-and publication reports before choosing a runtime revision.
+A merged GitHub fix is not proof of a Hugging Face release. This repository's
+[`hf-kernel-publish`](.github/workflows/hf-kernel-publish.yml) workflow is the only
+writer of the kernel repo. It builds `build/torch-cpu` and `build/torch-universal`
+from `torch-ext/` at one reviewed commit, pushes them fast-forward to the kernel
+repo's `main` and `v1` branches, and then loads them anonymously through
+`get_kernel` in a fresh job to check the served bytes against GitHub. Its publish
+and verify receipts (workflow artifacts) name the kernel-repo commits.
 
-Set `SZL_INVARIANTS_HF_REVISION` to the **immutable Hugging Face commit from the
-verified publication**, not a branch name, version label, or the GitHub source
-commit. Use the client version qualified with that release. Do not substitute
-`main` when a receipt or revision is unavailable; stop instead.
+The stable channel is `get_kernel("SZLHOLDINGS/szl-invariants", version=1, trust_remote_code=True)`.
+For production, pin an exact build: set `SZL_INVARIANTS_HF_REVISION` to the
+**immutable kernel-repo commit of `v1` from a passing verify receipt**, not a
+branch name, version label, or the GitHub source commit. Use `kernels>=0.17.2`.
+Do not substitute `main` when a receipt or revision is unavailable; stop instead.
 
 ```python
 import os
