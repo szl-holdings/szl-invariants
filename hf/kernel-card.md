@@ -15,6 +15,9 @@ szl-governance:
   honest_blocked: "a VIOLATED invariant stays VIOLATED: statuses are never coerced to a pass"
 ---
 
+<p><img src="https://raw.githubusercontent.com/szl-holdings/szl-brand/27d12e77fc0f9f1a0e5fae8b34adf2380d51d070/kit/logos/orbit-v2/suite/szl-icon-32.svg" alt="SZL Holdings" width="40" height="40" /></p>
+
+
 # {{KERNEL_NAME}}
 
 The eight falsifiable runtime invariants of the a11oy backbone, as an offline governance kernel
@@ -119,3 +122,5 @@ and the chain hashing in `runLedger.ts` and `receipts.ts`. Backed by the Lean 4 
 ## License
 
 Apache-2.0 (see `LICENSE` and `NOTICE`). Copyright 2026 SZL Holdings.
+
+Artwork: SZL Orbit · © 2026 SZL Holdings / Stephen Lutar · [CC BY 4.0](https://github.com/szl-holdings/szl-brand/blob/27d12e77fc0f9f1a0e5fae8b34adf2380d51d070/kit/LICENSE) · [Trademark notice](https://github.com/szl-holdings/szl-brand/blob/27d12e77fc0f9f1a0e5fae8b34adf2380d51d070/NOTICE).
