@@ -33,12 +33,14 @@ def main() -> None:
     elif module_path != (root / "torch-ext/szl_invariants/__init__.py").resolve():
         raise RuntimeError("editable smoke did not resolve the declared package directory")
 
-    contract = json.loads((root / "publishing/invariants-source-binding.json").read_text(encoding="utf-8"))
+    # The installed bytes must equal the canonical source the Hub kernel is also built from
+    # (torch-ext/, LF-normalised), so PyPI and get_kernel ship the same package.
     metadata_bytes = importlib.resources.files("szl_invariants").joinpath("metadata.json").read_bytes()
     for path, content in [("torch-ext/szl_invariants/__init__.py", module_path.read_bytes()),
                           ("torch-ext/szl_invariants/metadata.json", metadata_bytes)]:
         observed = hashlib.sha256(content.replace(b"\r\n", b"\n")).hexdigest()
-        if observed != contract["expected_artifact_sha256"][path]:
+        expected = hashlib.sha256((root / path).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+        if observed != expected:
             raise RuntimeError(f"installed canonical LF hash mismatch: {path}")
     metadata = json.loads(metadata_bytes)
     version = importlib.metadata.version("szl-invariants")

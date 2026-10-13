@@ -35,21 +35,20 @@ jobs:
           python-version: '3.12.13'
           check-latest: false
 
-      - name: Verify restored Hub kernel and falsifiability suite
+      # The Hub build/ (torch-cpu + torch-universal) is generated from torch-ext/ by
+      # hf-kernel-publish.yml and verified there through get_kernel; it is never committed.
+      - name: Verify canonical kernel source and falsifiability suite
         shell: bash
         run: |
           set -euo pipefail
-          kernel='build/torch-universal/szl_invariants/__init__.py'
-          mirror='torch-ext/szl_invariants/__init__.py'
-          cmp "$kernel" "$mirror"
-          cmp build/torch-universal/szl_invariants/metadata.json \
-            torch-ext/szl_invariants/metadata.json
+          kernel='torch-ext/szl_invariants/__init__.py'
+          test -z "$(git ls-files -- build)"
           grep -Fq 'def verify_ed25519(' "$kernel"
           grep -Fq 'def run_invariants(' "$kernel"
           grep -Fq 'def selfcheck(' "$kernel"
           grep -Fq 'def _build_demo_chain(' "$kernel"
           test ! -e model.joblib
-          if grep -R -n -E "joblib\.(load|dump)[[:space:]]*\(|pickle\.loads?[[:space:]]*\(|dill\.load[[:space:]]*\(" scripts tests torch-ext build; then
+          if grep -R -n -E "joblib\.(load|dump)[[:space:]]*\(|pickle\.loads?[[:space:]]*\(|dill\.load[[:space:]]*\(" scripts tests torch-ext hf; then
             echo "unsafe serialization API still in approved path" >&2
             exit 1
           fi

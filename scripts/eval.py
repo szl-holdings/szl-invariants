@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fail-closed evaluator for szl-invariants.
 
-Approved path: kernel source under torch-ext/ / build/torch-universal/.
+Approved path: kernel source under torch-ext/ (published to the Hub kernel repo by hf-kernel-publish).
 model.joblib is executable serialization. This script never calls a pickle
 loader. If the pickle file is in the tree, exit 2.
 """

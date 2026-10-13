@@ -8,8 +8,8 @@ tampering) — that is the honest reason the kernel stays authoritative.
 Seeded, receipted, reproducible."""
 import json, os, random, sys, time, platform
 _here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if os.path.isdir(os.path.join(_here, "build", "torch-universal")):
-    sys.path.insert(0, os.path.join(_here, "build", "torch-universal"))  # in-repo run
+if os.path.isdir(os.path.join(_here, "torch-ext", "szl_invariants")):
+    sys.path.insert(0, os.path.join(_here, "torch-ext"))  # in-repo run
 else:
     sys.path.insert(0, "/tmp/kernel-probe/szl-invariants/build/torch-universal")  # forge-dev run
 import szl_invariants as si
@@ -195,7 +195,7 @@ quarantine = {
   "status": "QUARANTINED",
   "artifact": "model.joblib",
   "reason": "sklearn/joblib pickle is executable serialization, not an approved load path",
-  "approved_load": "torch-ext/szl_invariants and build/torch-universal/szl_invariants",
+  "approved_load": "torch-ext/szl_invariants (Hub: get_kernel('SZLHOLDINGS/szl-invariants', version=1))",
   "hub": "SZLHOLDINGS/szl-invariants model.joblib remains Hub residue until a Hub PR with exact parent_commit deletes it",
 }
 with open(f"{out}/SURROGATE_QUARANTINE.json", "w") as f: json.dump(quarantine, f, indent=2)

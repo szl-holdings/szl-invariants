@@ -31,7 +31,7 @@ DOCTRINE (mirrors artifacts/api-server/src/routes/invariants.ts):
 Quickstart (offline):
 
     from kernels import get_kernel
-    inv = get_kernel("SZLHOLDINGS/szl-invariants", revision="main", trust_remote_code=True)
+    inv = get_kernel("SZLHOLDINGS/szl-invariants", version=1, trust_remote_code=True)
 
     rows = inv.load_jsonl("runs_export.jsonl")          # your ledger export
     samples = inv.load_jsonl("training_samples.jsonl")  # optional flywheel export

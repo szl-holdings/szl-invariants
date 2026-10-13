@@ -1,0 +1,41 @@
+{
+  "schema": "szl.hf-kernels/v1",
+  "$comment": "Consumed by .github/workflows/hf-kernel-publish.yml via scripts/szl_kernel_publish.py. This repository is the only source and the only writer of the kernel repo SZLHOLDINGS/szl-invariants and of its model-repo pointer twin.",
+  "kernels": [
+    {
+      "repo_id": "SZLHOLDINGS/szl-invariants",
+      "name": "szl-invariants",
+      "version": 1,
+      "license": "Apache-2.0",
+      "source_repository": "szl-holdings/szl-invariants",
+      "packages": [
+        { "src": "torch-ext/szl_invariants", "name": "szl_invariants" }
+      ],
+      "card": "hf/kernel-card.md",
+      "license_file": "LICENSE",
+      "extra_files": {
+        "NOTICE": "NOTICE"
+      },
+      "prune_paths": [
+        "OPERATIONAL.json",
+        "BENCH.laptop-blackwell.json"
+      ],
+      "python_depends": [],
+      "smoke": "hf/kernel_smoke.py",
+      "model_twin": {
+        "repo_id": "SZLHOLDINGS/szl-invariants",
+        "mode": "pointer",
+        "card": "hf/model-twin-pointer.md",
+        "prune_paths": [
+          "build/",
+          "torch-ext/",
+          "build.toml",
+          "scripts/",
+          "tests/",
+          "OPERATIONAL.json",
+          "BENCH.laptop-blackwell.json"
+        ]
+      }
+    }
+  ]
+}
