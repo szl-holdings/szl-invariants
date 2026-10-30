@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Publish the current main tree. Tag `v0.1.1` already points at `204dc131`, nine commits behind this revision, so that version cannot be published again.
+- Carry the kernel publisher, packaging contract, and CI updates already admitted on main. The kernel quickstart example loads `version=1` rather than `revision="main"`.
+- Invariant logic is unchanged from the 0.1.1 candidate. The distribution, module, and kernel metadata versions move together.
+
 ## 0.1.1 (release candidate)
 
 - Prepare a maintenance release carrying the canonical GitHub Source, issue,
