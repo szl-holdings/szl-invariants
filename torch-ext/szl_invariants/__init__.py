@@ -533,7 +533,7 @@ def _flywheel_lineage(
     samples: Optional[List[Dict[str, Any]]],
 ) -> Dict[str, Any]:
     title = "Flywheel eats only its own verified tail (own-metal, never demo/cloud)"
-    predicate = "every training sample with a receiptId joins to a runs row with demo = false and servedNode IS NOT NULL"
+    predicate = "every training sample with a receiptId joins to exactly one runs row with demo strictly false and servedNode IS NOT NULL"
     doctrine = "sovereign flywheel lineage — samples come only from real own-metal serves"
     if samples is None:
         return _inv(
@@ -548,9 +548,10 @@ def _flywheel_lineage(
             "no flywheel training-sample export supplied — lineage cannot be replayed (honest UNAVAILABLE)",
         )
     # Offline replay of the SQL left-join by receiptId.
-    by_receipt = {
-        r.get("receiptId"): r for r in rows if r.get("receiptId") is not None
-    }
+    by_receipt: Dict[Any, List[Dict[str, Any]]] = {}
+    for r in rows:
+        if r.get("receiptId") is not None:
+            by_receipt.setdefault(r["receiptId"], []).append(r)
     # The supplied ledger rows are authoritative for the join. A pre-joined
     # export's runFound/runDemo/runServedNode fields are only a claim: they
     # are cross-checked against the recomputed join and never trusted in its
@@ -558,7 +559,10 @@ def _flywheel_lineage(
     lineage = []
     for s in samples:
         rid = s.get("receiptId")
-        row = by_receipt.get(rid) if rid is not None else None
+        matches = by_receipt.get(rid, []) if rid is not None else []
+        # A duplicate receipt ID cannot identify which run supplied a sample.
+        # Never let export ordering select a convenient provenance claim.
+        row = matches[0] if len(matches) == 1 else None
         joined = {
             "sampleId": s.get("sampleId", s.get("id")),
             "receiptId": rid,
@@ -580,13 +584,13 @@ def _flywheel_lineage(
         s
         for s in linkable
         if not s.get("runFound")
-        or s.get("runDemo") is True
+        or s.get("runDemo") is not False
         or s.get("runServedNode") is None
         or s.get("claimMismatch")
     ]
     status = "NO_DATA" if not linkable else "VIOLATED" if bad else "HOLDS"
     if bad:
-        detail = f"{len(bad)} sample(s) trace to a demo/cloud/missing run or contradict the ledger join — the lineage claim is violated"
+        detail = f"{len(bad)} sample(s) have an ambiguous/missing run, lack explicit non-demo own-metal provenance, or contradict the ledger join — the lineage claim is violated"
     else:
         detail = f"{len(linkable)} sample(s) all trace to a real own-metal serve" + (
             f"; {unlinkable} sample(s) have no receiptId to join (excluded, stated)"
