@@ -617,10 +617,24 @@ def _ed25519_tally(
     coverage metric (no second verification pass — mirrors the app)."""
     if pubkey is None:
         return {"keyId": None, "verified": 0, "hardFail": 0, "rotated": 0, "worst": None}
-    if _ed25519_backend() is None:
+    backend = _ed25519_backend()
+    if backend is None:
         return {"keyId": None, "verified": 0, "hardFail": 0, "rotated": 0, "worst": None,
                 "unavailableReason": "optional cryptography backend unavailable — signatures were not verified"}
-    cur_key = keyid_from_spki(pubkey)
+    # Rotation is meaningful only relative to a usable Ed25519 verification
+    # key. Invalid configuration must not be mistaken for an older signing
+    # key, or abort the remaining non-cryptographic ledger checks.
+    import base64
+
+    public_key_type, load_der_public_key = backend
+    try:
+        der = base64.b64decode(pubkey, validate=True)
+        if not isinstance(load_der_public_key(der), public_key_type):
+            raise ValueError("public key is not Ed25519")
+    except Exception:
+        return {"keyId": None, "verified": 0, "hardFail": 0, "rotated": 0, "worst": None,
+                "unavailableReason": "supplied public key is not valid base64-encoded Ed25519 SPKI — signatures were not verified"}
+    cur_key = sha256(der).hexdigest()[:16]
     verified = hard_fail = rotated = 0
     worst = None
     for r in signed_rows:
@@ -655,6 +669,8 @@ def run_invariants(
     - `samples=None` → the flywheel-lineage invariant is UNAVAILABLE.
     - `pubkey=None` → the ed25519 invariant + latent coverage are UNAVAILABLE.
     - missing optional cryptography → signature checks and coverage UNAVAILABLE.
+    - malformed or non-Ed25519 public key → signature checks and coverage
+      UNAVAILABLE; other ledger invariants still run.
 
     Returns a dict with `label`, `status`, `summary`, `latentVerification`,
     `invariants`, `doctrine`, `note`.
