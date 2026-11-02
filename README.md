@@ -16,6 +16,13 @@
 
 Software kernel for SZL runtime invariants. **Not a model. No weights.**
 
+The offline flywheel-lineage check requires each sample's receipt ID to identify
+exactly one exported ledger row, with `demo` explicitly `false` and a non-null
+`servedNode`. Duplicate receipt IDs and absent or non-boolean demo flags violate
+the check; export order and a sample's pre-joined claims cannot resolve ambiguous
+provenance. This checks the supplied export's consistency, not the authenticity
+or completeness of the underlying run history.
+
 Python lives under `torch-ext/szl_invariants/` (`__init__.py` is the package). Hub kernel: [`kernels/SZLHOLDINGS/szl-invariants`](https://huggingface.co/kernels/SZLHOLDINGS/szl-invariants), published from this repository by [`hf-kernel-publish`](.github/workflows/hf-kernel-publish.yml) (card source: [`hf/kernel-card.md`](hf/kernel-card.md)). The model repo [`SZLHOLDINGS/szl-invariants`](https://huggingface.co/SZLHOLDINGS/szl-invariants) only points to the kernel repo; it holds no loadable build.
 
 ## What this is NOT
