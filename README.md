@@ -82,3 +82,7 @@ run. `KEY_ROTATED` remains reserved for receipts that fail verification under a
 usable supplied key and identify a different signing key.
 
 Doctrine v11. Λ = Conjecture 1 (advisory, never a theorem). Apache-2.0. Owner: Stephen Lutar / SZL Holdings.
+
+## License
+
+Apache-2.0 — see [LICENSE](LICENSE).
