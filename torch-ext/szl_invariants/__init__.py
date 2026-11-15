@@ -102,7 +102,7 @@ LATENT_VERIFICATION_NOTE = (
 PROVENANCE = {
     "mirrors": "a11oy backbone /api/invariants (artifacts/api-server/src/routes/invariants.ts)",
     "lean_repo": "szl-holdings/lutar-lean",
-    "doi_lutar_lean": "10.5281/zenodo.20434308",
+    "doi_lutar_lean": "10.5281/zenodo.24239654",
     "lambda_status": "Conjecture 1 (open) — uniqueness unproven; advisory only",
     "trained_weights_present": False,
     "trained_weights_role": "QUARANTINED — model.joblib/pickle is not an approved load path; kernel source remains authoritative",
