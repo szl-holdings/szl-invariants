@@ -117,7 +117,7 @@ The same package is on PyPI as `szl-invariants`.
 Mirrors the a11oy backbone `/api/invariants` recompute (`artifacts/api-server/src/routes/invariants.ts`)
 and the chain hashing in `runLedger.ts` and `receipts.ts`. Backed by the Lean 4 formalization
 [szl-holdings/lutar-lean](https://github.com/szl-holdings/lutar-lean), DOI
-[10.5281/zenodo.20434308](https://doi.org/10.5281/zenodo.20434308).
+[10.5281/zenodo.24239654](https://doi.org/10.5281/zenodo.24239654).
 
 ## License
 
