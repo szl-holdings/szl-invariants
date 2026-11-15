@@ -18,6 +18,6 @@
   "mirrors": "a11oy backbone /api/invariants (artifacts/api-server/src/routes/invariants.ts)",
   "provenance": {
     "lean_repo": "szl-holdings/lutar-lean",
-    "doi_lutar_lean": "10.5281/zenodo.20434308"
+    "doi_lutar_lean": "10.5281/zenodo.24239654"
   }
 }
