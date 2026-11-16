@@ -9,6 +9,7 @@ tags:
   - provenance
   - receipts
   - ed25519
+  - doi:10.5281/zenodo.19944926
 szl-governance:
   verdict: ADVISORY
   lambda: "Conjecture 1 (open): uniqueness unproven; untouched by these invariants; advisory only"
